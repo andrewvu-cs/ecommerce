@@ -3,9 +3,9 @@ import React from "react";
 import CustomButton from "../CustomButton/CustomButton.component";
 import FormInput from "../FormInput/FormInput.component";
 
-import { auth, createUserProfileDcoument } from "../../firebase/firebase.utils";
+import { auth, createUserProfileDocument } from "../../firebase/firebase.utils";
 
-import "./Signup.styles.scss";
+import "./SignUp.styles.scss";
 
 class SignUp extends React.Component {
   state = {
@@ -30,7 +30,7 @@ class SignUp extends React.Component {
         password
       );
 
-      await createUserProfileDcoument(user, { displayName });
+      await createUserProfileDocument(user, { displayName });
 
       this.setState({
         displayName: "",
@@ -61,6 +61,7 @@ class SignUp extends React.Component {
             name="displayName"
             value={displayName}
             label="Display Name"
+            handleChange={this.handleChange}
             required
           />
           <FormInput
@@ -68,6 +69,7 @@ class SignUp extends React.Component {
             name="email"
             value={email}
             label="Email"
+            handleChange={this.handleChange}
             required
           />
           <FormInput
@@ -75,6 +77,7 @@ class SignUp extends React.Component {
             name="password"
             value={password}
             label="Password"
+            handleChange={this.handleChange}
             required
           />
           <FormInput
@@ -82,6 +85,7 @@ class SignUp extends React.Component {
             name="confirmPassword"
             value={confirmPassword}
             label="Confirm Password"
+            handleChange={this.handleChange}
             required
           />
           <CustomButton type="submit">SIGN UP</CustomButton>

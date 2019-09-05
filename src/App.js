@@ -16,9 +16,9 @@ class App extends React.Component {
 
   unsubscribeFromAuth = null;
 
-  // Subscriber, Persistence user sessions, oAuth for 3rd party 
+  // Subscriber, Persistence user sessions, oAuth for 3rd party
   componentDidMount() {
-    this.unsubscribeFromAuth = auth.onAuthStateChanged( async userAuth => {
+    this.unsubscribeFromAuth = auth.onAuthStateChanged(async userAuth => {
       // checks if the user is signing in
       if (userAuth) {
         const userRef = await createUserProfileDocument(userAuth);
@@ -27,30 +27,32 @@ class App extends React.Component {
         // Subscribe to see if our data is changing
         userRef.onSnapshot(snapShot => {
           // snapshot.data() gives us detailed info on the db
-          this.setState({
-            currentUser: {
-              id: snapShot.id,
-              ...snapShot.data()
+          this.setState(
+            {
+              currentUser: {
+                id: snapShot.id,
+                ...snapShot.data()
+              }
+            },
+            () => {
+              console.log(this.state);
             }
-          }, () => {
-            console.log(this.state);
-          });
+          );
         });
       }
       this.setState({ currentUser: userAuth });
-    })  
+    });
   }
 
   // closes subscription, if not, memory leaks will occur
   componentWillUnmount() {
     this.unsubscribeFromAuth();
   }
-  
 
   render() {
     return (
       <div>
-        <Header currentUser={this.state.currentUser}/>
+        <Header currentUser={this.state.currentUser} />
         <Switch>
           <Route exact path="/" component={HomePage} />
           <Route path="/shop" component={ShopPage} />
