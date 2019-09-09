@@ -1,5 +1,6 @@
 import React from "react";
 import { connect } from "react-redux";
+import { createStructuredSelector } from 'reselect';
 
 import { toggleCartHidden } from "../../redux/cart/cart.actions";
 import { selectCartItemsCount } from '../../redux/cart/cart.selectors'; 
@@ -15,10 +16,10 @@ const CartIcon = ({ toggleCartHidden, itemCount }) => (
   </div>
 );
 
-const mapStateToProps = state => ({
+const mapStateToProps = createStructuredSelector({
   // example of a selector in Redux, will keep running because the obj is brand new
   // should implement memoization to stop rerendering, will allow us to seperate our selector and be reusable
-  itemCount: selectCartItemsCount(state)
+  itemCount: selectCartItemsCount
 });
 
 const mapDispatchToProps = dispatch => ({
