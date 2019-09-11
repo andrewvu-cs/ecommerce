@@ -39,6 +39,22 @@ export const createUserProfileDocument = async (userAuth, additionalData) => {
     }
 
     return userRef;
+};
+
+export const addCollectionAndDocuments = async (collectionKey, objectsToAdd) => {
+    const collectionRef = firestore.collection(collectionKey);
+    console.log(collectionRef);
+
+    // batch write cause of big sets
+    const batch = firestore.batch();
+    objectsToAdd.forEach(obj => {
+        //get the document at an empty string, give me a new entry
+        const newDocRef = collectionRef.doc();
+        batch.set(newDocRef, obj);
+    })
+
+    // fires our batch returns a promise
+    return await batch.commit()
 }
 
 firebase.initializeApp(config);

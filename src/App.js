@@ -1,28 +1,33 @@
 import React from "react";
 import { Switch, Route, Redirect } from "react-router-dom";
 import { connect } from "react-redux";
-import { createStructuredSelector } from 'reselect'; 
+import { createStructuredSelector } from "reselect";
 
 import "./App.css";
 
 import HomePage from "./pages/Homepage/Homepage.component";
 import ShopPage from "./pages/Shop/Shop.component";
-import CheckoutPage from './pages/Checkout/Checkout.component';
+import CheckoutPage from "./pages/Checkout/Checkout.component";
 import SignInAndSignUp from "./pages/SignInSignUp/SignInSignUp.component";
 
 import Header from "./components/Header/Header.component";
 
-import { auth, createUserProfileDocument } from "./firebase/firebase.utils";
+import {
+  auth,
+  createUserProfileDocument,
+  addCollectionAndDocuments
+} from "./firebase/firebase.utils";
 
 import { setCurrentUser } from "./redux/user/user.actions";
-import { selectCurrentUser } from './redux/user/user.selectors';
+import { selectCurrentUser } from "./redux/user/user.selectors";
+import { selectCollectionsForPreview } from "./redux/shop/shop.selectors";
 
 class App extends React.Component {
   unsubscribeFromAuth = null;
 
   // Subscriber, Persistence user sessions, oAuth for 3rd party
   componentDidMount() {
-    const { setCurrentUser } = this.props;
+    const { setCurrentUser, collectionsArray } = this.props;
 
     this.unsubscribeFromAuth = auth.onAuthStateChanged(async userAuth => {
       // checks if the user is signing in
@@ -40,6 +45,10 @@ class App extends React.Component {
         });
       }
       setCurrentUser(userAuth);
+      addCollectionAndDocuments(
+        "collections",
+        collectionsArray.map(({ title, items }) => ({ title, items }))
+      );
     });
   }
 
@@ -60,7 +69,7 @@ class App extends React.Component {
             exact
             path="/signin"
             render={() =>
-              this.props.currentUser ? (<Redirect to="/" />) : (<SignInAndSignUp />)
+              this.props.currentUser ? <Redirect to="/" /> : <SignInAndSignUp />
             }
           />
         </Switch>
@@ -71,7 +80,8 @@ class App extends React.Component {
 
 // accesses the store to see our value and gives us back the value
 const mapStateToProps = createStructuredSelector({
-  currentUser: selectCurrentUser
+  currentUser: selectCurrentUser,
+  collectionsArray: selectCollectionsForPreview
 });
 
 // we import the action
