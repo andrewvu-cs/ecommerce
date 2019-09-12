@@ -14,47 +14,68 @@ const config = {
 
 // takes user auth object and store it into the database
 export const createUserProfileDocument = async (userAuth, additionalData) => {
-    if (!userAuth) return;
+  if (!userAuth) return;
 
-    const userRef = firestore.doc(`users/${userAuth.uid}`);
+  const userRef = firestore.doc(`users/${userAuth.uid}`);
 
-    const snapShot = await userRef.get();
-    
-    // if there is no data in the snapshot
-    if(!snapShot.exists){
-        const { displayName, email } = userAuth;
-        const createdAt = new Date();
-        
-        try{
-            // create method
-            await userRef.set({
-                displayName,
-                email,
-                createdAt,
-                ...additionalData
-            })
-        } catch(error) {
-            console.log('error creating user', error.message);
-        }
+  const snapShot = await userRef.get();
+
+  // if there is no data in the snapshot
+  if (!snapShot.exists) {
+    const { displayName, email } = userAuth;
+    const createdAt = new Date();
+
+    try {
+      // create method
+      await userRef.set({
+        displayName,
+        email,
+        createdAt,
+        ...additionalData
+      });
+    } catch (error) {
+      console.log("error creating user", error.message);
     }
+  }
 
-    return userRef;
+  return userRef;
 };
 
-export const addCollectionAndDocuments = async (collectionKey, objectsToAdd) => {
-    const collectionRef = firestore.collection(collectionKey);
-    console.log(collectionRef);
+export const addCollectionAndDocuments = async (
+  collectionKey,
+  objectsToAdd
+) => {
+  const collectionRef = firestore.collection(collectionKey);
+  console.log(collectionRef);
 
-    // batch write cause of big sets
-    const batch = firestore.batch();
-    objectsToAdd.forEach(obj => {
-        //get the document at an empty string, give me a new entry
-        const newDocRef = collectionRef.doc();
-        batch.set(newDocRef, obj);
-    })
+  // batch write cause of big sets
+  const batch = firestore.batch();
+  objectsToAdd.forEach(obj => {
+    //get the document at an empty string, give me a new entry
+    const newDocRef = collectionRef.doc();
+    batch.set(newDocRef, obj);
+  });
 
-    // fires our batch returns a promise
-    return await batch.commit()
+  // fires our batch returns a promise
+  return await batch.commit();
+};
+
+export const convertCollectionsSnapshotToMap = (collections) => {
+    const transformedCollection = collections.docs.map(doc => {
+        const { title, items } = doc.data();
+
+        return {
+            routeName: encodeURI(title.toLowerCase()),
+            id: doc.id,
+            title,
+            items
+        }
+    });
+
+    return transformedCollection.reduce((accumulator, collection) => {
+        accumulator[collection.title.toLowerCase()] = collection;
+        return accumulator;
+    }, {});
 }
 
 firebase.initializeApp(config);

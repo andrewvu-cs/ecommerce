@@ -15,19 +15,17 @@ import Header from "./components/Header/Header.component";
 import {
   auth,
   createUserProfileDocument,
-  addCollectionAndDocuments
 } from "./firebase/firebase.utils";
 
 import { setCurrentUser } from "./redux/user/user.actions";
 import { selectCurrentUser } from "./redux/user/user.selectors";
-import { selectCollectionsForPreview } from "./redux/shop/shop.selectors";
 
 class App extends React.Component {
   unsubscribeFromAuth = null;
 
   // Subscriber, Persistence user sessions, oAuth for 3rd party
   componentDidMount() {
-    const { setCurrentUser, collectionsArray } = this.props;
+    const { setCurrentUser } = this.props;
 
     this.unsubscribeFromAuth = auth.onAuthStateChanged(async userAuth => {
       // checks if the user is signing in
@@ -45,10 +43,6 @@ class App extends React.Component {
         });
       }
       setCurrentUser(userAuth);
-      addCollectionAndDocuments(
-        "collections",
-        collectionsArray.map(({ title, items }) => ({ title, items }))
-      );
     });
   }
 
@@ -81,7 +75,6 @@ class App extends React.Component {
 // accesses the store to see our value and gives us back the value
 const mapStateToProps = createStructuredSelector({
   currentUser: selectCurrentUser,
-  collectionsArray: selectCollectionsForPreview
 });
 
 // we import the action
