@@ -23,10 +23,12 @@ import { selectCurrentUser } from "./redux/user/user.selectors";
 class App extends React.Component {
   unsubscribeFromAuth = null;
 
+  // OBSERVER PATTERN
   // Subscriber, Persistence user sessions, oAuth for 3rd party
   componentDidMount() {
     const { setCurrentUser } = this.props;
 
+    // listener or observer, function below is our 'next function, can set an error or complete.  
     this.unsubscribeFromAuth = auth.onAuthStateChanged(async userAuth => {
       // checks if the user is signing in
       if (userAuth) {
@@ -44,7 +46,10 @@ class App extends React.Component {
       }
       setCurrentUser(userAuth);
     });
+
   }
+
+  
 
   // closes subscription, if not, memory leaks will occur
   componentWillUnmount() {
